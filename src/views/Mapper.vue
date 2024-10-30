@@ -55,7 +55,7 @@
 }
 </style>
 <template>
-  <div class="scrollable-container">
+  <div class="scrollable-container" @scroll="handleScroll" ref="scrollableDiv">
   <div class="container has-text-centered" >
     <div class="floating-button">
       <router-link to="/result" class="button finish">
@@ -91,14 +91,20 @@ export default {
   },
   data () {
     return {
-      selections: []
+      selections: [],
+      scrollTop: 0,
+      scrollLeft: 0
     }
   },
   methods: {
     addSelection: function () {
       var Selection = Vue.extend(selection)
       var instance = new Selection({
-        propsData: { uid: this.selections.length }
+        propsData: {
+          uid: this.selections.length,
+          scrollTop: this.scrollTop,
+          scrollLeft: this.scrollLeft
+        }
       })
       var div = document.createElement('div')
       div.id = 'selection-mount-target'
@@ -111,6 +117,10 @@ export default {
         this.selections.splice(uid, 1)
         document.getElementById('selection-' + uid).remove()
       })
+    },
+    handleScroll () {
+      this.scrollTop = this.$refs.scrollableDiv.scrollTop
+      this.scrollLeft = this.$refs.scrollableDiv.scrollLeft
     }
   }
 }

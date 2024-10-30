@@ -19,6 +19,8 @@
                     :h="100"
                     :minw="20"
                     :minh="20"
+                    :x="this.scrollLeft"
+                    :y="this.scrollTop"
                     v-on:resizing="resize"
                     v-on:dragging="resize"
                     style="background-color:rgba(255,255,255,0.8);">
@@ -48,7 +50,17 @@ export default {
       target: '#'
     }
   },
-  props: ['uid'],
+  props: {
+    uid: Number,
+    scrollTop: {
+      type: Number,
+      default: 0
+    },
+    scrollLeft: {
+      type: Number,
+      default: 0
+    }
+  },
   methods: {
     resize (newRect) {
       this.width = newRect.width
