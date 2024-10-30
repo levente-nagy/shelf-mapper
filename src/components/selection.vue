@@ -17,6 +17,8 @@
                     v-bind:isActive="true"
                     :w="100"
                     :h="100"
+                    :minw="20"
+                    :minh="20"
                     v-on:resizing="resize"
                     v-on:dragging="resize"
                     style="background-color:rgba(255,255,255,0.8);">

@@ -15,7 +15,7 @@
 }
 .removeButton,.editButton,.product{
   color:white;
-  font-size: 20px;
+  font-size: 15px;
 }
 .has-text-centered{
   overflow-y: hidden !important;
