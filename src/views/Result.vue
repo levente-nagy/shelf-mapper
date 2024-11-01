@@ -27,7 +27,7 @@
 <template>
   <div class="container">
     <div id="result-code">
-      <div id="projectsvg">
+      <div id="sdvshelf">
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" :viewBox="'0 0 ' + state.image.width + ' ' + state.image.height" preserveAspectRatio="xMinYMin meet" id="shelf_svg">
         <image :width="state.image.width" :height="state.image.height" :href="this.$shelfUrl"></image>
             <filter id="imagePattern" x="0%" y="0%" width="100%" height="100%">
