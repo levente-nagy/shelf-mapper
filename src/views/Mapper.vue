@@ -49,9 +49,12 @@
 .scrollable-container::-webkit-scrollbar-track {
   background: lightgrey;
 }
-.finish,.add{
-  width: 50px;
+.finish,.add,.export,.import{
+  width: 90px;
   margin: 5px;
+}
+.fa-plus-square,.fa-check,.fa-upload,.fa-download{
+  font-size: 15px;
 }
 </style>
 <template>
@@ -59,12 +62,21 @@
   <div class="container has-text-centered" >
     <div class="floating-button">
       <router-link to="/result" class="button finish">
-      <i class="fa fa-check">
-      </i>
+      <i class="fa fa-check"></i>&nbsp;Done
       </router-link>
       <br/>
+      <input type="file" @change="importSelections" style="display: none;" ref="fileInput" />
+      <div class="button import" @click="openFileInput">
+        <i class="fas fa-upload"></i>&nbsp;Import
+      </div>
+      <br/>
+      <div class="button export" @click="exportSelections">
+        <i class="fas fa-download"></i>&nbsp;Export
+      </div>
+      <br/>
+
       <div class="button add" v-on:click="addSelection">
-        <i class="far fa-2x fa-plus-square"></i>
+        <i class="far fa-plus-square"></i> &nbsp;Add
       </div>
     </div>
     <div class="level">
@@ -93,23 +105,30 @@ export default {
     return {
       selections: [],
       scrollTop: 0,
-      scrollLeft: 0
+      scrollLeft: 0,
+      isAdding: false
     }
   },
   methods: {
-    addSelection: function () {
-      var Selection = Vue.extend(selection)
-      var instance = new Selection({
+    addSelection () {
+      if (this.isAdding) return
+      this.isAdding = true
+      const Selection = Vue.extend(selection)
+      const instance = new Selection({
         propsData: {
           uid: this.selections.length,
-          scrollTop: this.scrollTop,
-          scrollLeft: this.scrollLeft
+          width: 100,
+          height: 100,
+          x: this.scrollLeft,
+          y: this.scrollTop,
+          url: '#',
+          target: '#'
         }
       })
-      var div = document.createElement('div')
-      div.id = 'selection-mount-target'
+      const div = document.createElement('div')
+      div.id = `selection-mount-target-${this.selections.length}`
       document.getElementById('mapper-canvas').appendChild(div)
-      instance.$mount('#selection-mount-target')
+      instance.$mount(div)
       this.selections.push(instance)
       instance.$on('remove', () => {
         const uid = instance.uid
@@ -117,10 +136,72 @@ export default {
         this.selections.splice(uid, 1)
         document.getElementById('selection-' + uid).remove()
       })
+      this.isAdding = false
     },
     handleScroll () {
       this.scrollTop = this.$refs.scrollableDiv.scrollTop
       this.scrollLeft = this.$refs.scrollableDiv.scrollLeft
+    },
+    exportSelections () {
+      const data = this.selections.map(selection => ({
+        width: selection.width,
+        height: selection.height,
+        x: selection.x,
+        y: selection.y,
+        url: selection.url,
+        target: selection.target
+      }))
+      const json = JSON.stringify(data, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'shelf_coords.json'
+      link.click()
+      URL.revokeObjectURL(url)
+    },
+    openFileInput () {
+      this.$refs.fileInput.click()
+    },
+    importSelections (event) {
+      const file = event.target.files[0]
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = e => {
+          try {
+            const importedSelections = JSON.parse(e.target.result)
+            importedSelections.forEach(selectionData => this.createSelectionFromData(selectionData))
+          } catch (error) {
+            alert('Invalid file format')
+          }
+        }
+        reader.readAsText(file)
+      }
+    },
+    createSelectionFromData (data, isImported = true) {
+      const Selection = Vue.extend(selection)
+      const instance = new Selection({
+        propsData: {
+          uid: this.selections.length,
+          width: data.width,
+          height: data.height,
+          x: isImported ? data.x : this.scrollLeft,
+          y: isImported ? data.y : this.scrollTo,
+          url: data.url,
+          target: data.target
+        }
+      })
+      const div = document.createElement('div')
+      div.id = `selection-mount-target-${this.selections.length}`
+      document.getElementById('mapper-canvas').appendChild(div)
+      instance.$mount(div)
+      this.selections.push(instance)
+      instance.$on('remove', () => {
+        const uid = instance.uid
+        instance.$destroy()
+        this.selections.splice(uid, 1)
+        document.getElementById('selection-' + uid).remove()
+      })
     }
   }
 }

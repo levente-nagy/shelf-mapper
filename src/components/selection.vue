@@ -15,12 +15,12 @@
     <VueDragResize  :id="'selection-' + uid"
                     :parentLimitation="true"
                     v-bind:isActive="true"
-                    :w="100"
-                    :h="100"
+                    :w="width"
+                    :h="height"
                     :minw="20"
                     :minh="20"
-                    :x="this.scrollLeft"
-                    :y="this.scrollTop"
+                    :x="x"
+                    :y="y"
                     v-on:resizing="resize"
                     v-on:dragging="resize"
                     style="background-color:rgba(255,255,255,0.8);">
@@ -40,18 +40,32 @@
 <script>
 import VueDragResize from 'vue-drag-resize'
 export default {
-  data () {
-    return {
-      width: 100,
-      height: 100,
-      x: 0,
-      y: 0,
-      url: '#',
-      target: '#'
-    }
-  },
   props: {
     uid: Number,
+    width: {
+      type: Number,
+      default: 100
+    },
+    height: {
+      type: Number,
+      default: 100
+    },
+    x: {
+      type: Number,
+      default: 0
+    },
+    y: {
+      type: Number,
+      default: 0
+    },
+    url: {
+      type: String,
+      default: '#'
+    },
+    target: {
+      type: String,
+      default: '#'
+    },
     scrollTop: {
       type: Number,
       default: 0
