@@ -83,12 +83,12 @@ export default {
       this.x = newRect.left
     },
     remove () {
-      if (confirm('Are you sure?') === true) {
+      if (confirm('Are you sure you want to delete this area?') === true) {
         this.$emit('remove')
       }
     },
     edit () {
-      var url = prompt('Image path: ', this.url)
+      var url = prompt('Zoom image path: ', this.url)
       var target = prompt('Product code: ', this.target)
       if (url != null) {
         this.url = url
